@@ -10,6 +10,7 @@ namespace FIXMatchingServer
 {
     class Program
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         static void Main(string[] args)
         {
             string cfgFile = ConfigurationManager.AppSettings["Configure"].ToString();
@@ -21,8 +22,27 @@ namespace FIXMatchingServer
 
             acceptor.Start();
             Console.WriteLine("press <enter> to quit");
+
+            Logger.Info("Start");
+
             Console.Read();
             acceptor.Stop();
+
+            Logger.Info("Stop");
+
+            NLog.LogManager.Shutdown();
+        }
+
+        static void TestGeneratorOrderNo()
+        {
+            OrderNoGenerator onGen = new OrderNoGenerator();
+
+            for( int i = 0; i < 100000; ++i)
+            {
+                string orderNo = onGen.GetOrderNo();
+
+                Logger.Info(string.Format("{0:000000} {1}", i, orderNo));
+            }
         }
     }
 }
