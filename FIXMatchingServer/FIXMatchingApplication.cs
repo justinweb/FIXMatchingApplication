@@ -37,16 +37,18 @@ namespace FIXMatchingServer
             Console.WriteLine("FromApp:" + message );
             Logger.Info("FromApp:" + message);
 
-            string tag35 = message.GetString(35);
+            string tag35 = message.Header.GetString(QuickFix.Fields.Tags.MsgType);
+            
             switch( tag35)
             {
                 case "D":
                     Order o = new Order(message);
                     o.OrderNum = onGenerator.GetOrderNo();
                     Message mResponse = o.GetPendingNewMessage();
+                    Logger.Info("OUT: " + mResponse.ToString());
                     SendMessage(mResponse);
                     break;
-            }
+            }            
         }
 
         public void OnCreate(SessionID sessionID)
@@ -74,7 +76,7 @@ namespace FIXMatchingServer
         public void ToApp(Message message, SessionID sessionID)
         {
             //throw new NotImplementedException();
-            Console.WriteLine("ToApp\r\n");
+            Console.WriteLine("ToApp:" + message.ToString() );
         }
 
         private void SendMessageThread()
@@ -94,7 +96,9 @@ namespace FIXMatchingServer
                     if (m != null)
                     {
                         // send
-                        Session.SendToTarget(m, MySessionID);
+                        Logger.Info("OUT: " + m.ToString());
+
+                        Session.SendToTarget(m, MySessionID);                        
                     }
                     else
                     {
